@@ -29,7 +29,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup():
-    init_db()
+   #  init_db()
     logger.info("Base de datos inicializada")
 
 

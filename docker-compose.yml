@@ -1,7 +1,13 @@
+version: '3.8'
+
 services:
   backend:
+    volumes:
+      - ./app/main.py:/app/app/main.py
     build: .
-    env_file: .env
+    container_name: mesa_ayuda_backend
+    env_file:
+      - .env
     ports:
-      - "${APP_PORT:-8000}:${APP_PORT:-8000}"
-    restart: unless-stopped
+      - "100.83.75.109:8105:8105"
+    restart: always
