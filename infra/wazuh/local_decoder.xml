@@ -1,0 +1,10 @@
+<decoder name="mesa_ayuda">
+  <prematch>^MesaDeAyuda:</prematch>
+</decoder>
+
+<decoder name="mesa_ayuda_login_failed">
+  <parent>mesa_ayuda</parent>
+  <regex>Failed login attempt for user '(\S+)' from IP: (\S+)</regex>
+  <order>dstuser, srcip</order>
+</decoder>
+
