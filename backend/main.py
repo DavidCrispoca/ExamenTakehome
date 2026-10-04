@@ -1,7 +1,7 @@
 import logging
 import os
 
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import config
@@ -29,7 +29,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup():
-   #  init_db()
+    # init_db()
     logger.info("Base de datos inicializada")
 
 
@@ -70,15 +70,40 @@ def registro(datos: RegistroIn):
 
 
 @app.post("/auth/login", tags=["Autenticación"])
-def login(datos: LoginIn):
+def login(datos: LoginIn, request: Request):
     query = (
         f"SELECT id, username, rol, password_hash FROM usuarios "
         f"WHERE username = '{datos.username}'"
     )
     usuario = fetch_one(query)
+    
+    # Validación cuando falla la autenticación
     if not usuario or not verify_password(datos.password, usuario["password_hash"]):
-        logger.warning(f"Login fallido para {datos.username} con clave {datos.password}")
+        
+        # 1. Obtener la IP pública real del cliente desde las cabeceras de Cloudflare / Nginx
+        cf_ip = request.headers.get("cf-connecting-ip")
+        x_forwarded_for = request.headers.get("x-forwarded-for")
+        
+        if cf_ip:
+            client_ip = cf_ip.strip()
+        elif x_forwarded_for:
+            client_ip = x_forwarded_for.split(",")[0].strip()
+        else:
+            client_ip = request.headers.get("x-real-ip") or (request.client.host if request.client else "unknown")
+        
+        # 2. Construir la entrada del log (SIN incluir la contraseña)
+        log_line = f"MesaDeAyuda: Failed login attempt for user '{datos.username}' from IP: {client_ip}\n"
+        
+        # 3. Guardar directamente en el archivo dentro del contenedor (/app/logs/app.log)
+        log_dir = "/app/logs"
+        os.makedirs(log_dir, exist_ok=True)
+        with open(os.path.join(log_dir, "app.log"), "a") as log_file:
+            log_file.write(log_line)
+
+        logger.warning(f"Login fallido para {datos.username}")
+        
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
+        
     return {"access_token": crear_token(usuario), "token_type": "bearer", "rol": usuario["rol"]}
 
 
