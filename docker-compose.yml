@@ -4,6 +4,7 @@ services:
   backend:
     volumes:
       - ./app/main.py:/app/app/main.py
+      - /var/log/mesa_ayuda:/app/logs
     build: .
     container_name: mesa_ayuda_backend
     env_file:
