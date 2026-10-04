@@ -1,3 +1,8 @@
 __pycache__/
 venv/
 *.pyc
+.env
+env_del_examen.txt
+cloudflared.deb
+.DS_Store
+app_guia_bak/
