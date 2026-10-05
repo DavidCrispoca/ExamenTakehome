@@ -161,5 +161,5 @@ def listar_usuarios(usuario: dict = Depends(usuario_actual)):
     if usuario["rol"] != "admin":
         raise HTTPException(status_code=403, detail="Solo administradores")
     return fetch_all(
-        "SELECT id, username, email, password_hash, rol, creado_en FROM usuarios"
+        "SELECT id, username, email, rol, creado_en FROM usuarios"
     )
