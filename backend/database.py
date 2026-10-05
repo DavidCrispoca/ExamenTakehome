@@ -1,7 +1,7 @@
 import pymysql
 from pymysql.cursors import DictCursor
 
-from app import config
+import config
 
 
 def get_connection():

@@ -4,10 +4,10 @@ import os
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from app import config
-from app.database import execute, fetch_all, fetch_one, init_db
-from app.schemas import EstadoIn, LoginIn, RegistroIn, TicketIn
-from app.security import crear_token, hash_password, usuario_actual, verify_password
+import config
+from database import execute, fetch_all, fetch_one, init_db
+from schemas import EstadoIn, LoginIn, RegistroIn, TicketIn
+from security import crear_token, hash_password, usuario_actual, verify_password
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("mesa_ayuda")
