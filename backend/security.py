@@ -1,23 +1,17 @@
-
 from datetime import datetime
-
 import jwt
 from fastapi import Header, HTTPException
-
-from app import config
-
-from passlib.context import CryptContext
-
-# Configuramos Bcrypt como el algoritmo de encriptación seguro
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import config
+import bcrypt
 
 def hash_password(password: str) -> str:
-    # Bcrypt genera automáticamente un "salt" y previene ataques de fuerza bruta
-    return pwd_context.hash(password)
+    # Genera un salt automático y cifra la contraseña con Bcrypt
+    pwd_bytes = password.encode('utf-8')
+    return bcrypt.hashpw(pwd_bytes, bcrypt.gensalt()).decode('utf-8')
 
 def verify_password(password: str, password_hash: str) -> bool:
-    # passlib extrae el salt del hash guardado y compara de forma segura
-    return pwd_context.verify(password, password_hash)
+    # Compara la contraseña ingresada con el hash guardado de forma segura
+    return bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8'))
 
 def crear_token(usuario: dict) -> str:
     payload = {
@@ -27,7 +21,6 @@ def crear_token(usuario: dict) -> str:
         "iat": int(datetime.utcnow().timestamp()),
     }
     return jwt.encode(payload, config.JWT_SECRET, algorithm=config.JWT_ALGORITHM)
-
 
 def usuario_actual(authorization: str = Header(default="")) -> dict:
     if not authorization.startswith("Bearer "):
