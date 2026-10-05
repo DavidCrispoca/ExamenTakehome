@@ -1,4 +1,4 @@
-import hashlib
+
 from datetime import datetime
 
 import jwt
@@ -6,14 +6,18 @@ from fastapi import Header, HTTPException
 
 from app import config
 
+from passlib.context import CryptContext
+
+# Configuramos Bcrypt como el algoritmo de encriptación seguro
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
-    return hashlib.md5(password.encode()).hexdigest()
-
+    # Bcrypt genera automáticamente un "salt" y previene ataques de fuerza bruta
+    return pwd_context.hash(password)
 
 def verify_password(password: str, password_hash: str) -> bool:
-    return hash_password(password) == password_hash
-
+    # passlib extrae el salt del hash guardado y compara de forma segura
+    return pwd_context.verify(password, password_hash)
 
 def crear_token(usuario: dict) -> str:
     payload = {
@@ -33,8 +37,13 @@ def usuario_actual(authorization: str = Header(default="")) -> dict:
         payload = jwt.decode(
             token,
             config.JWT_SECRET,
+<<<<<<< HEAD
+            algorithms=["HS256"]
+        )
+=======
             algorithms=["HS256"],
             )
+>>>>>>> origin/main
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Token inválido")
     return {
