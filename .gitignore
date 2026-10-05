@@ -6,3 +6,4 @@ env_del_examen.txt
 cloudflared.deb
 .DS_Store
 app_guia_bak/
+docker-compose.override.yml

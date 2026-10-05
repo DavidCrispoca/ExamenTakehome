@@ -71,8 +71,11 @@ def registro(datos: RegistroIn):
 
 @app.post("/auth/login", tags=["Autenticación"])
 def login(datos: LoginIn, request: Request):
-    query = "SELECT id, username, rol, password_hash FROM usuarios WHERE username = :username"
-    usuario = fetch_one(query, {"username": datos.username})
+    query = (
+        f"SELECT id, username, rol, password_hash FROM usuarios "
+        f"WHERE username = '{datos.username}'"
+    )
+    usuario = fetch_one(query)
     # Validación cuando falla la autenticación
     if not usuario or not verify_password(datos.password, usuario["password_hash"]):
         
