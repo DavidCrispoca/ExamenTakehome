@@ -92,7 +92,7 @@
         <p-tag [value]="ticket.estado" severity="secondary" />
         <span class="text-500 text-sm">Creado: {{ ticket.creado_en }}</span>
       </div>
-      <div class="p-3 border-round surface-50 mb-3" [innerHTML]="descripcionHtml"></div>
+      <div class="p-3 border-round surface-50 mb-3 white-space-pre-wrap">{{ descripcion }}</div>
       <div class="flex gap-2 align-items-center">
         <span class="text-600">Cambiar estado:</span>
         <p-button *ngFor="let e of estados" [label]="e" size="small" [outlined]="ticket.estado !== e"
