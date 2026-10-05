@@ -30,7 +30,7 @@ def usuario_actual(authorization: str = Header(default="")) -> dict:
         payload = jwt.decode(
             token,
             config.JWT_SECRET,
-            algorithms=["HS256"],
+            algorithms=["HS256"]
         )
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Token inválido")
