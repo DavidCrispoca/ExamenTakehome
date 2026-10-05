@@ -56,7 +56,7 @@ def debug_config():
 
 @app.post("/auth/registro", tags=["Autenticación"])
 def registro(datos: RegistroIn):
-    logger.info(f"Registro de usuario: {datos.username} / {datos.password} / {datos.email}")
+    logger.info(f"Registro exitoso para el usuario: {datos.username} (Email: {datos.email})")
     existe = fetch_one("SELECT id FROM usuarios WHERE username = %s", (datos.username,))
     if existe:
         raise HTTPException(status_code=400, detail="El usuario ya existe")
