@@ -71,11 +71,10 @@ def registro(datos: RegistroIn):
 
 @app.post("/auth/login", tags=["Autenticación"])
 def login(datos: LoginIn, request: Request):
-    query = (
-        f"SELECT id, username, rol, password_hash FROM usuarios "
-        f"WHERE username = '{datos.username}'"
+    usuario = fetch_one(
+        "SELECT id, username, rol, password_hash FROM usuarios WHERE username = %s",
+        (datos.username,),
     )
-    usuario = fetch_one(query)
     # Validación cuando falla la autenticación
     if not usuario or not verify_password(datos.password, usuario["password_hash"]):
         
@@ -129,6 +128,8 @@ def ver_ticket(ticket_id: int, usuario: dict = Depends(usuario_actual)):
     ticket = fetch_one("SELECT * FROM tickets WHERE id = %s", (ticket_id,))
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket no encontrado")
+    if ticket["usuario_id"] != usuario["id"] and usuario["rol"] != "admin":
+     raise HTTPException(status_code=403, detail="No autorizado para ver este ticket")
     return ticket
 
 
@@ -147,6 +148,8 @@ def cambiar_estado(ticket_id: int, datos: EstadoIn, usuario: dict = Depends(usua
     ticket = fetch_one("SELECT * FROM tickets WHERE id = %s", (ticket_id,))
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket no encontrado")
+    if ticket["usuario_id"] != usuario["id"] and usuario ["rol"] != "admin":
+     raise HTTPException(status_code=403, detail="No autorizado  para modificar este ticket")
     execute("UPDATE tickets SET estado = %s WHERE id = %s", (datos.estado, ticket_id))
     return fetch_one("SELECT * FROM tickets WHERE id = %s", (ticket_id,))
 
